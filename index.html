@@ -1,966 +1,708 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeFlow | Visual Development Platform</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>2048 - 经典数字游戏</title>
     <style>
         * {
-            margin: 0;
-            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Roboto', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f9fbfd;
+            background: linear-gradient(145deg, #f9f6f2 0%, #e9e4da 100%);
+            font-family: 'Segoe UI', 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
         }
-        
-        h1, h2, h3, h4 {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            line-height: 1.3;
+
+        /* 游戏主容器 */
+        .game-container {
+            background-color: #bbada0;
+            border-radius: 36px;
+            padding: 24px 20px 28px 20px;
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+            transition: all 0.2s ease;
         }
-        
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        /* Header & Navigation */
-        header {
-            background-color: #fff;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
-            position: fixed;
-            width: 100%;
-            z-index: 1000;
-        }
-        
-        nav {
+
+        /* 头部区域 */
+        .game-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-        }
-        
-        .logo-icon {
-            color: #4361ee;
-            font-size: 28px;
-            margin-right: 10px;
-        }
-        
-        .logo-text {
-            font-family: 'Poppins', sans-serif;
-            font-size: 24px;
-            font-weight: 700;
-            color: #333;
-        }
-        
-        .logo-text span {
-            color: #4361ee;
-        }
-        
-        .nav-links {
-            display: flex;
-            list-style: none;
-        }
-        
-        .nav-links li {
-            margin-left: 30px;
-        }
-        
-        .nav-links a {
-            text-decoration: none;
-            color: #555;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-        
-        .nav-links a:hover {
-            color: #4361ee;
-        }
-        
-        .cta-button {
-            background-color: #4361ee;
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-        
-        .cta-button:hover {
-            background-color: #3a56d4;
-            transform: translateY(-2px);
-        }
-        
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #333;
-            cursor: pointer;
-        }
-        
-        /* Hero Section */
-        .hero {
-            padding: 150px 0 100px;
-            background: linear-gradient(135deg, #f0f4ff 0%, #f9fbfd 100%);
-        }
-        
-        .hero-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .hero-text {
-            flex: 1;
-            padding-right: 40px;
-        }
-        
-        .hero-text h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-            color: #222;
-        }
-        
-        .hero-text h1 span {
-            color: #4361ee;
-        }
-        
-        .hero-text p {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 30px;
-            max-width: 600px;
-        }
-        
-        .hero-buttons {
-            display: flex;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
             gap: 15px;
         }
-        
-        .secondary-button {
-            background-color: white;
-            color: #4361ee;
-            border: 2px solid #4361ee;
-            padding: 12px 28px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+
+        .title {
+            font-size: 64px;
+            font-weight: 800;
+            color: #eee4da;
+            text-shadow: 3px 3px 0 #bbada0;
+            letter-spacing: 2px;
+            line-height: 0.9;
+            background: linear-gradient(135deg, #f7e8d0, #e0cba4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: none;
         }
-        
-        .secondary-button:hover {
-            background-color: #f0f4ff;
+        /* 兼容纯色降级 */
+        @supports not (background-clip: text) {
+            .title {
+                color: #eee4da;
+                text-shadow: 3px 3px 0 #bbada0;
+            }
         }
-        
-        .hero-image {
-            flex: 1;
-            text-align: center;
-        }
-        
-        .hero-image img {
-            max-width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 20px 40px rgba(67, 97, 238, 0.15);
-        }
-        
-        /* Features Section */
-        .section-title {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-        
-        .section-title h2 {
-            font-size: 36px;
-            color: #222;
-            margin-bottom: 15px;
-        }
-        
-        .section-title p {
-            color: #666;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-        
-        .features {
-            padding: 100px 0;
-            background-color: white;
-        }
-        
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-        }
-        
-        .feature-card {
-            background: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-        }
-        
-        .feature-icon {
-            background-color: #eef2ff;
-            color: #4361ee;
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
+
+        .score-panel {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            font-size: 28px;
+            gap: 14px;
         }
-        
-        .feature-card h3 {
-            font-size: 22px;
-            margin-bottom: 15px;
-        }
-        
-        .feature-card p {
-            color: #666;
-        }
-        
-        /* Benefits Section */
-        .benefits {
-            padding: 100px 0;
-            background-color: #f0f4ff;
-        }
-        
-        .benefits-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-        
-        .benefit-item {
+
+        .score-box, .best-box {
+            background: #bbada0;
+            background: #8f7a66;
+            border-radius: 18px;
+            padding: 8px 20px;
             text-align: center;
-            padding: 30px 20px;
+            box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1), 0 3px 6px rgba(0,0,0,0.1);
         }
-        
-        .benefit-icon {
-            color: #4361ee;
-            font-size: 40px;
-            margin-bottom: 20px;
-        }
-        
-        .benefit-item h3 {
-            font-size: 22px;
-            margin-bottom: 15px;
-        }
-        
-        .benefit-item p {
-            color: #666;
-        }
-        
-        /* Testimonials */
-        .testimonials {
-            padding: 100px 0;
-            background-color: white;
-        }
-        
-        .testimonial-slider {
-            max-width: 800px;
-            margin: 0 auto;
-            position: relative;
-        }
-        
-        .testimonial {
-            background: #f9fbfd;
-            padding: 40px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .testimonial-text {
-            font-size: 18px;
-            font-style: italic;
-            margin-bottom: 30px;
-            color: #555;
-        }
-        
-        .testimonial-author {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .author-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background-color: #ddd;
-            margin-right: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+
+        .score-label {
+            font-size: 14px;
             font-weight: bold;
-            color: #4361ee;
-            font-size: 24px;
+            color: #eee4da;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
-        
-        .author-info h4 {
+
+        .score-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        }
+
+        .new-game-btn {
+            background: #8f7a66;
+            border: none;
+            border-radius: 26px;
             font-size: 18px;
-            margin-bottom: 5px;
+            font-weight: bold;
+            padding: 10px 24px;
+            color: #f9f6f2;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 0 #5e3e2b;
+            font-family: inherit;
         }
-        
-        .author-info p {
-            color: #777;
-            font-size: 14px;
+
+        .new-game-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #5e3e2b;
         }
-        
-        /* Pricing Section */
-        .pricing {
-            padding: 100px 0;
-            background-color: #f9fbfd;
+
+        /* 网格区域 触屏滑动区域设定 */
+        .grid-wrapper {
+            touch-action: none;
+            border-radius: 24px;
+            background-color: #cdc1b4;
+            padding: 12px;
         }
-        
-        .pricing-grid {
+
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-        }
-        
-        .pricing-card {
-            background: white;
-            border-radius: 10px;
-            padding: 40px 30px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-            text-align: center;
-            transition: transform 0.3s;
-        }
-        
-        .pricing-card.featured {
-            border-top: 5px solid #4361ee;
-            transform: scale(1.05);
-            position: relative;
-        }
-        
-        .featured-badge {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #4361ee;
-            color: white;
-            padding: 5px 20px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            background-color: #cdc1b4;
             border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
         }
-        
-        .pricing-card:hover {
-            transform: translateY(-10px);
-        }
-        
-        .pricing-card.featured:hover {
-            transform: scale(1.05) translateY(-10px);
-        }
-        
-        .plan-name {
-            font-size: 24px;
-            margin-bottom: 15px;
-            color: #333;
-        }
-        
-        .plan-price {
-            font-size: 48px;
-            font-weight: 700;
-            color: #4361ee;
-            margin-bottom: 20px;
-        }
-        
-        .plan-price span {
-            font-size: 16px;
-            color: #777;
-        }
-        
-        .plan-features {
-            list-style: none;
-            margin-bottom: 30px;
-        }
-        
-        .plan-features li {
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-            color: #555;
-        }
-        
-        .plan-features li:last-child {
-            border-bottom: none;
-        }
-        
-        /* CTA Section */
-        .cta-section {
-            padding: 100px 0;
-            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
-            text-align: center;
-            color: white;
-        }
-        
-        .cta-section h2 {
+
+        .tile {
+            aspect-ratio: 1 / 1;
+            background-color: #cdc1b4;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 36px;
-            margin-bottom: 20px;
+            font-weight: 800;
+            font-family: inherit;
+            color: #776e65;
+            transition: all 0.1s linear;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
-        .cta-section p {
-            font-size: 18px;
-            max-width: 700px;
-            margin: 0 auto 30px;
-            opacity: 0.9;
-        }
-        
-        .cta-section .cta-button {
-            background-color: white;
-            color: #4361ee;
-            font-size: 16px;
-            padding: 15px 40px;
-        }
-        
-        .cta-section .cta-button:hover {
-            background-color: #f0f4ff;
-        }
-        
-        /* Footer */
-        footer {
-            background-color: #222;
-            color: #ccc;
-            padding: 70px 0 20px;
-        }
-        
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-            margin-bottom: 50px;
-        }
-        
-        .footer-column h3 {
-            font-size: 20px;
-            color: white;
-            margin-bottom: 25px;
-        }
-        
-        .footer-links {
-            list-style: none;
-        }
-        
-        .footer-links li {
-            margin-bottom: 12px;
-        }
-        
-        .footer-links a {
-            color: #aaa;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-links a:hover {
-            color: #4361ee;
-        }
-        
-        .copyright {
+
+        /* 不同数值的背景颜色及文字样式 */
+        .tile-2 { background-color: #eee4da; color: #776e65; box-shadow: inset 0 -2px 0 #d4c5b0, 0 2px 5px rgba(0,0,0,0.05);}
+        .tile-4 { background-color: #ede0c8; color: #776e65; }
+        .tile-8 { background-color: #f2b179; color: #f9f6f2; }
+        .tile-16 { background-color: #f59563; color: #f9f6f2; }
+        .tile-32 { background-color: #f67c5f; color: #f9f6f2; }
+        .tile-64 { background-color: #f65e3b; color: #f9f6f2; }
+        .tile-128 { background-color: #edcf72; color: #f9f6f2; font-size: 32px; }
+        .tile-256 { background-color: #edcc61; color: #f9f6f2; font-size: 32px; }
+        .tile-512 { background-color: #edc850; color: #f9f6f2; font-size: 32px; }
+        .tile-1024 { background-color: #edc53f; color: #f9f6f2; font-size: 28px; }
+        .tile-2048 { background-color: #edc22e; color: #f9f6f2; font-size: 28px; }
+        .tile-super { background-color: #3c3a32; color: #f9f6f2; font-size: 26px; } /* 大于2048 */
+
+        /* 消息提示浮层 */
+        .message-area {
+            position: relative;
+            margin-top: 18px;
             text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid #444;
-            font-size: 14px;
-            color: #888;
+            min-height: 48px;
         }
-        
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .hero-content {
-                flex-direction: column;
+        .game-message {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(6px);
+            padding: 8px 24px;
+            border-radius: 60px;
+            color: #f9f6f2;
+            font-weight: bold;
+            font-size: 18px;
+            letter-spacing: 1px;
+            animation: fadeInUp 0.3s ease;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
             }
-            
-            .hero-text {
-                padding-right: 0;
-                margin-bottom: 50px;
-                text-align: center;
-            }
-            
-            .hero-text p {
-                margin: 0 auto 30px;
-            }
-            
-            .pricing-card.featured {
-                transform: none;
-            }
-            
-            .pricing-card.featured:hover {
-                transform: translateY(-10px);
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
-        
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
+
+        /* 移动端适配 */
+        @media (max-width: 550px) {
+            .game-container {
+                padding: 16px 12px 20px 12px;
             }
-            
-            .mobile-menu-btn {
-                display: block;
+            .title {
+                font-size: 44px;
             }
-            
-            .hero-text h1 {
-                font-size: 36px;
+            .score-value {
+                font-size: 26px;
             }
-            
-            .section-title h2 {
-                font-size: 30px;
+            .score-box, .best-box {
+                padding: 4px 16px;
             }
-            
-            .hero-buttons {
-                flex-direction: column;
-                align-items: center;
+            .tile {
+                font-size: 28px;
             }
-            
-            .hero-buttons button {
-                width: 100%;
-                max-width: 300px;
+            .tile-128, .tile-256, .tile-512 {
+                font-size: 24px;
+            }
+            .tile-1024, .tile-2048, .tile-super {
+                font-size: 20px;
+            }
+            .grid {
+                gap: 8px;
+            }
+            .grid-wrapper {
+                padding: 8px;
+            }
+            .new-game-btn {
+                padding: 8px 18px;
+                font-size: 16px;
             }
         }
-        
-        @media (max-width: 576px) {
-            .hero {
-                padding: 130px 0 80px;
+
+        @media (max-width: 450px) {
+            .tile {
+                font-size: 22px;
             }
-            
-            .features, .benefits, .testimonials, .pricing, .cta-section {
-                padding: 70px 0;
+            .tile-128, .tile-256, .tile-512 {
+                font-size: 20px;
             }
-            
-            .feature-card, .testimonial {
-                padding: 25px;
+            .tile-1024, .tile-2048, .tile-super {
+                font-size: 16px;
             }
-            
-            .plan-price {
-                font-size: 36px;
+            .score-value {
+                font-size: 22px;
             }
+        }
+
+        footer {
+            font-size: 12px;
+            text-align: center;
+            margin-top: 18px;
+            color: #8f7a66;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
-    <!-- Header & Navigation -->
-    <header>
-        <div class="container">
-            <nav>
-                <div class="logo">
-                    <div class="logo-icon"><i class="fas fa-bezier-curve"></i></div>
-                    <div class="logo-text">Code<span>Flow</span></div>
-                </div>
-                
-                <ul class="nav-links">
-                    <li><a href="#features">Features</a></li>
-                    <li><a href="#benefits">Benefits</a></li>
-                    <li><a href="#testimonials">Testimonials</a></li>
-                    <li><a href="#pricing">Pricing</a></li>
-                    <li><a href="#">Resources</a></li>
-                </ul>
-                
-                <button class="cta-button">Start Free Trial</button>
-                <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
-            </nav>
+<div class="game-container">
+    <div class="game-header">
+        <div class="title">2048</div>
+        <div class="score-panel">
+            <div class="score-box">
+                <div class="score-label">SCORE</div>
+                <div class="score-value" id="scoreDisplay">0</div>
+            </div>
+            <div class="best-box">
+                <div class="score-label">BEST</div>
+                <div class="score-value" id="bestDisplay">0</div>
+            </div>
+            <button class="new-game-btn" id="newGameBtn">✨ 新游戏</button>
         </div>
-    </header>
+    </div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <h1>Build Apps Faster With <span>Visual Development</span></h1>
-                    <p>CodeFlow empowers teams to create enterprise-grade applications with minimal coding. Drag, drop, and connect components to build powerful web and mobile apps in record time.</p>
-                    <div class="hero-buttons">
-                        <button class="cta-button">Start Building Free</button>
-                        <button class="secondary-button">Watch Demo</button>
-                    </div>
-                </div>
-                <div class="hero-image">
-                    <img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="CodeFlow Platform Interface">
-                </div>
-            </div>
+    <div class="grid-wrapper" id="gameGridWrapper">
+        <div class="grid" id="gridContainer">
+            <!-- 动态生成4x4格子 -->
         </div>
-    </section>
+    </div>
+    <div class="message-area" id="messageArea"></div>
+    <footer>← ↑ ↓ → 滑动或键盘 | 合并相同数字</footer>
+</div>
 
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <div class="container">
-            <div class="section-title">
-                <h2>Powerful Features for Rapid Development</h2>
-                <p>CodeFlow provides all the tools you need to build, deploy, and scale applications without writing extensive code.</p>
-            </div>
-            
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-th-large"></i>
-                    </div>
-                    <h3>Visual Builder</h3>
-                    <p>Drag and drop UI components to design responsive interfaces. Connect data sources with simple point-and-click actions.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <h3>Database Integration</h3>
-                    <p>Connect to any data source with built-in connectors. Automatically generate CRUD operations without writing SQL.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <h3>Cross-Platform</h3>
-                    <p>Build once, deploy everywhere. Generate applications for web, iOS, and Android from a single visual design.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-code"></i>
-                    </div>
-                    <h3>Extensible with Code</h3>
-                    <p>Add custom functionality with JavaScript when needed. Our platform doesn't limit your creativity or complexity.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h3>Enterprise Security</h3>
-                    <p>Built-in authentication, authorization, and data encryption. SOC2 compliant with enterprise-grade security features.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-rocket"></i>
-                    </div>
-                    <h3>One-Click Deployment</h3>
-                    <p>Deploy to cloud or on-premises with a single click. Automatic scaling and monitoring included.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Benefits Section -->
-    <section class="benefits" id="benefits">
-        <div class="container">
-            <div class="section-title">
-                <h2>Why Choose CodeFlow?</h2>
-                <p>Join thousands of companies accelerating their digital transformation with low-code development.</p>
-            </div>
-            
-            <div class="benefits-grid">
-                <div class="benefit-item">
-                    <div class="benefit-icon">
-                        <i class="fas fa-bolt"></i>
-                    </div>
-                    <h3>10x Faster Development</h3>
-                    <p>Build applications in days instead of months with visual development tools.</p>
-                </div>
-                
-                <div class="benefit-item">
-                    <div class="benefit-icon">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
-                    <h3>Reduce Costs by 70%</h3>
-                    <p>Lower development and maintenance costs with fewer resources required.</p>
-                </div>
-                
-                <div class="benefit-item">
-                    <div class="benefit-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3>Citizen Developers</h3>
-                    <p>Enable business users to build solutions with minimal IT assistance.</p>
-                </div>
-                
-                <div class="benefit-item">
-                    <div class="benefit-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3>Scale Effortlessly</h3>
-                    <p>From prototype to enterprise-scale applications with the same platform.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials -->
-    <section class="testimonials" id="testimonials">
-        <div class="container">
-            <div class="section-title">
-                <h2>Trusted by Industry Leaders</h2>
-                <p>See what our customers have to say about their experience with CodeFlow.</p>
-            </div>
-            
-            <div class="testimonial-slider">
-                <div class="testimonial">
-                    <div class="testimonial-text">
-                        "CodeFlow transformed how we deliver solutions to our business units. What used to take 6 months now takes 3 weeks. Our development team can focus on complex problems while business teams build their own solutions."
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">SC</div>
-                        <div class="author-info">
-                            <h4>Sarah Chen</h4>
-                            <p>CTO, TechGrowth Inc.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Pricing Section -->
-    <section class="pricing" id="pricing">
-        <div class="container">
-            <div class="section-title">
-                <h2>Simple, Transparent Pricing</h2>
-                <p>Choose the plan that fits your needs. All plans include core features with no hidden fees.</p>
-            </div>
-            
-            <div class="pricing-grid">
-                <div class="pricing-card">
-                    <h3 class="plan-name">Starter</h3>
-                    <div class="plan-price">$29<span>/month</span></div>
-                    <ul class="plan-features">
-                        <li>Up to 5 users</li>
-                        <li>10 GB storage</li>
-                        <li>Basic components</li>
-                        <li>Community support</li>
-                        <li>1 production app</li>
-                    </ul>
-                    <button class="secondary-button">Get Started</button>
-                </div>
-                
-                <div class="pricing-card featured">
-                    <div class="featured-badge">Most Popular</div>
-                    <h3 class="plan-name">Professional</h3>
-                    <div class="plan-price">$89<span>/month</span></div>
-                    <ul class="plan-features">
-                        <li>Up to 25 users</li>
-                        <li>100 GB storage</li>
-                        <li>All components</li>
-                        <li>Priority support</li>
-                        <li>10 production apps</li>
-                        <li>Custom branding</li>
-                    </ul>
-                    <button class="cta-button">Try Free for 14 Days</button>
-                </div>
-                
-                <div class="pricing-card">
-                    <h3 class="plan-name">Enterprise</h3>
-                    <div class="plan-price">Custom</div>
-                    <ul class="plan-features">
-                        <li>Unlimited users</li>
-                        <li>Unlimited storage</li>
-                        <li>All features included</li>
-                        <li>24/7 dedicated support</li>
-                        <li>Unlimited apps</li>
-                        <li>On-premises option</li>
-                    </ul>
-                    <button class="secondary-button">Contact Sales</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="container">
-            <h2>Start Building Today</h2>
-            <p>Join over 10,000 companies that use CodeFlow to accelerate their application development. No credit card required for the free trial.</p>
-            <button class="cta-button">Get Started for Free</button>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <div class="logo">
-                        <div class="logo-icon"><i class="fas fa-bezier-curve"></i></div>
-                        <div class="logo-text">Code<span>Flow</span></div>
-                    </div>
-                    <p style="margin-top: 20px; color: #aaa;">The leading visual development platform for building enterprise applications with minimal coding.</p>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Product</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Features</a></li>
-                        <li><a href="#">Pricing</a></li>
-                        <li><a href="#">Use Cases</a></li>
-                        <li><a href="#">Integrations</a></li>
-                        <li><a href="#">Roadmap</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Resources</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Documentation</a></li>
-                        <li><a href="#">Tutorials</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Community</a></li>
-                        <li><a href="#">Support</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Company</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Careers</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="copyright">
-                <p>&copy; 2023 CodeFlow. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        // Mobile menu toggle
-        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
-            const navLinks = document.querySelector('.nav-links');
-            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
-            
-            // Adjust for mobile
-            if (window.innerWidth <= 768) {
-                if (navLinks.style.display === 'flex') {
-                    navLinks.style.flexDirection = 'column';
-                    navLinks.style.position = 'absolute';
-                    navLinks.style.top = '80px';
-                    navLinks.style.left = '0';
-                    navLinks.style.width = '100%';
-                    navLinks.style.backgroundColor = 'white';
-                    navLinks.style.padding = '20px';
-                    navLinks.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
-                    
-                    const navItems = document.querySelectorAll('.nav-links li');
-                    navItems.forEach(item => {
-                        item.style.margin = '10px 0';
-                    });
+<script>
+    // ---------- 游戏核心 ----------
+    let board = [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
+    ];
+    let currentScore = 0;
+    let bestScore = 0;
+    let gameOverFlag = false;
+    let winFlag = false;      // 是否已显示过胜利消息（避免重复弹）
+    let winAchieved = false;  // 是否已经达到2048（游戏胜利成就，但不阻止继续）
+    
+    // DOM 元素
+    const gridContainer = document.getElementById('gridContainer');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const bestDisplay = document.getElementById('bestDisplay');
+    const newGameBtn = document.getElementById('newGameBtn');
+    const messageArea = document.getElementById('messageArea');
+    
+    // 初始化本地最高分
+    function loadBestScore() {
+        const saved = localStorage.getItem('2048_best_score');
+        if (saved && !isNaN(parseInt(saved))) {
+            bestScore = parseInt(saved);
+        } else {
+            bestScore = 0;
+        }
+        bestDisplay.innerText = bestScore;
+    }
+    
+    function updateBestScore() {
+        if (currentScore > bestScore) {
+            bestScore = currentScore;
+            bestDisplay.innerText = bestScore;
+            localStorage.setItem('2048_best_score', bestScore);
+        }
+    }
+    
+    // 更新分数显示
+    function updateScoreUI() {
+        scoreDisplay.innerText = currentScore;
+        updateBestScore();
+    }
+    
+    // 添加临时浮动消息 (胜利 / 游戏结束)
+    function showMessage(text, isError = false) {
+        messageArea.innerHTML = `<div class="game-message" style="background:${isError ? '#b33a2ecc' : '#2e7d64cc'}">${text}</div>`;
+        setTimeout(() => {
+            if (messageArea.firstChild) {
+                messageArea.firstChild.remove();
+            }
+        }, 1800);
+    }
+    
+    // 检查胜利 (2048 或以上)
+    function checkWin() {
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                if (board[i][j] >= 2048 && !winFlag) {
+                    winFlag = true;
+                    winAchieved = true;
+                    showMessage('🎉 恭喜达成 2048！ 继续冲击更高分 🎉', false);
+                    return true;
                 }
             }
-        });
-        
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                const targetId = this.getAttribute('href');
-                if(targetId === '#') return;
-                
-                const targetElement = document.querySelector(targetId);
-                if(targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 80,
-                        behavior: 'smooth'
-                    });
-                    
-                    // Close mobile menu if open
-                    if(window.innerWidth <= 768) {
-                        document.querySelector('.nav-links').style.display = 'none';
-                    }
-                }
-            });
-        });
-        
-        // Simple testimonial slider
-        const testimonials = [
-            {
-                text: "CodeFlow transformed how we deliver solutions to our business units. What used to take 6 months now takes 3 weeks. Our development team can focus on complex problems while business teams build their own solutions.",
-                name: "Sarah Chen",
-                position: "CTO, TechGrowth Inc.",
-                initials: "SC"
-            },
-            {
-                text: "We reduced our app development time by 80% using CodeFlow. The visual interface made it easy for our analysts to build data dashboards without waiting for IT resources.",
-                name: "Marcus Johnson",
-                position: "Director of Operations, DataCorp",
-                initials: "MJ"
-            },
-            {
-                text: "As a non-technical founder, CodeFlow allowed me to build our MVP in just 2 months. I could test ideas quickly and iterate based on user feedback without deep coding knowledge.",
-                name: "Lisa Wang",
-                position: "Founder, StartupLabs",
-                initials: "LW"
+        }
+        return false;
+    }
+    
+    // 检查是否无法移动 (游戏结束)
+    function isGameActuallyOver() {
+        // 有空位则还能玩
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                if (board[i][j] === 0) return false;
             }
-        ];
-        
-        let currentTestimonial = 0;
-        const testimonialElement = document.querySelector('.testimonial');
-        
-        function rotateTestimonial() {
-            currentTestimonial = (currentTestimonial + 1) % testimonials.length;
-            updateTestimonial();
+        }
+        // 没有空位，检查相邻水平或竖直是否有相等
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                const val = board[i][j];
+                if (j + 1 < 4 && board[i][j+1] === val) return false;
+                if (i + 1 < 4 && board[i+1][j] === val) return false;
+            }
+        }
+        return true;
+    }
+    
+    // 设置游戏结束标志并展示消息
+    function setGameOver() {
+        if (!gameOverFlag) {
+            gameOverFlag = true;
+            showMessage('💀 GAME OVER 💀  点击新游戏', true);
+        }
+    }
+    
+    // ----- 核心合并逻辑 (针对一行) 返回 {newRow, scoreGain} -----
+    function mergeRowLeft(row) {
+        // 过滤零
+        let filtered = row.filter(v => v !== 0);
+        let newRow = [];
+        let gain = 0;
+        for (let i = 0; i < filtered.length; i++) {
+            if (i + 1 < filtered.length && filtered[i] === filtered[i + 1]) {
+                // 合并
+                let mergedVal = filtered[i] * 2;
+                newRow.push(mergedVal);
+                gain += mergedVal;
+                i++; // 跳过下一个元素
+            } else {
+                newRow.push(filtered[i]);
+            }
+        }
+        // 补零到长度4
+        while (newRow.length < 4) newRow.push(0);
+        return { newRow, gain };
+    }
+    
+    // 右移: 反转后左移再反转
+    function mergeRowRight(row) {
+        let reversed = [...row].reverse();
+        let { newRow: mergedRev, gain } = mergeRowLeft(reversed);
+        let result = mergedRev.reverse();
+        return { newRow: result, gain };
+    }
+    
+    // 获取列
+    function getColumn(board, colIndex) {
+        return board.map(row => row[colIndex]);
+    }
+    
+    // 设置列
+    function setColumn(board, colIndex, columnArray) {
+        for (let i = 0; i < 4; i++) {
+            board[i][colIndex] = columnArray[i];
+        }
+    }
+    
+    // 移动方向
+    function moveLeft() {
+        let changed = false;
+        let totalGain = 0;
+        for (let i = 0; i < 4; i++) {
+            let oldRow = [...board[i]];
+            let { newRow, gain } = mergeRowLeft(oldRow);
+            if (gain > 0) totalGain += gain;
+            board[i] = newRow;
+            if (!changed && JSON.stringify(oldRow) !== JSON.stringify(newRow)) {
+                changed = true;
+            }
+        }
+        if (changed) currentScore += totalGain;
+        return changed;
+    }
+    
+    function moveRight() {
+        let changed = false;
+        let totalGain = 0;
+        for (let i = 0; i < 4; i++) {
+            let oldRow = [...board[i]];
+            let { newRow, gain } = mergeRowRight(oldRow);
+            if (gain > 0) totalGain += gain;
+            board[i] = newRow;
+            if (!changed && JSON.stringify(oldRow) !== JSON.stringify(newRow)) {
+                changed = true;
+            }
+        }
+        if (changed) currentScore += totalGain;
+        return changed;
+    }
+    
+    function moveUp() {
+        let changed = false;
+        let totalGain = 0;
+        for (let j = 0; j < 4; j++) {
+            let oldCol = getColumn(board, j);
+            let { newRow: newCol, gain } = mergeRowLeft(oldCol);
+            if (gain > 0) totalGain += gain;
+            setColumn(board, j, newCol);
+            if (!changed && JSON.stringify(oldCol) !== JSON.stringify(newCol)) {
+                changed = true;
+            }
+        }
+        if (changed) currentScore += totalGain;
+        return changed;
+    }
+    
+    function moveDown() {
+        let changed = false;
+        let totalGain = 0;
+        for (let j = 0; j < 4; j++) {
+            let oldCol = getColumn(board, j);
+            let { newRow: newCol, gain } = mergeRowRight(oldCol);
+            if (gain > 0) totalGain += gain;
+            setColumn(board, j, newCol);
+            if (!changed && JSON.stringify(oldCol) !== JSON.stringify(newCol)) {
+                changed = true;
+            }
+        }
+        if (changed) currentScore += totalGain;
+        return changed;
+    }
+    
+    // 随机生成新数字 (2 或 4, 90% 2, 10% 4)
+    function addRandomTile() {
+        let emptyCells = [];
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                if (board[i][j] === 0) emptyCells.push({x: i, y: j});
+            }
+        }
+        if (emptyCells.length === 0) return false;
+        const randomIndex = Math.floor(Math.random() * emptyCells.length);
+        const { x, y } = emptyCells[randomIndex];
+        const value = Math.random() < 0.9 ? 2 : 4;
+        board[x][y] = value;
+        return true;
+    }
+    
+    // 重置游戏 (初始化)
+    function initGame() {
+        // 清空棋盘
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                board[i][j] = 0;
+            }
+        }
+        currentScore = 0;
+        gameOverFlag = false;
+        winFlag = false;
+        winAchieved = false;
+        updateScoreUI();
+        // 添加两个初始数字
+        addRandomTile();
+        addRandomTile();
+        // 渲染
+        renderBoard();
+        // 清除任何残留消息
+        messageArea.innerHTML = '';
+        // 额外再次确保无胜利残留标志影响结束判断
+    }
+    
+    // 执行移动并处理后续 (生成新块、更新UI、结束检测等)
+    function performMove(moveFunc) {
+        if (gameOverFlag) {
+            showMessage('游戏已结束，请点击新游戏', true);
+            return false;
         }
         
-        function updateTestimonial() {
-            const testimonial = testimonials[currentTestimonial];
-            testimonialElement.innerHTML = `
-                <div class="testimonial-text">"${testimonial.text}"</div>
-                <div class="testimonial-author">
-                    <div class="author-avatar">${testimonial.initials}</div>
-                    <div class="author-info">
-                        <h4>${testimonial.name}</h4>
-                        <p>${testimonial.position}</p>
-                    </div>
-                </div>
-            `;
+        // 备份分数与棋盘（用于比较变化）
+        let oldScore = currentScore;
+        let oldBoard = copyBoard(board);
+        
+        let hasChanged = moveFunc();  // 执行移动，内部更新currentScore和board
+        
+        if (!hasChanged) {
+            // 无变化，不生成新块
+            return false;
         }
         
-        // Auto-rotate testimonials every 5 seconds
-        setInterval(rotateTestimonial, 5000);
+        // 分数更新UI
+        updateScoreUI();
         
-        // CTA button interactions
-        document.querySelectorAll('.cta-button').forEach(button => {
-            button.addEventListener('click', function() {
-                alert('Thank you for your interest in CodeFlow! You would be redirected to the signup page in a real implementation.');
-            });
-        });
+        // 生成随机方块
+        addRandomTile();
         
-        // Pricing card interactions
-        document.querySelectorAll('.pricing-card button').forEach(button => {
-            button.addEventListener('click', function() {
-                const planName = this.closest('.pricing-card').querySelector('.plan-name').textContent;
-                alert(`You selected the ${planName} plan. In a real implementation, you would be redirected to the checkout process.`);
-            });
+        // 重新渲染
+        renderBoard();
+        
+        // 胜利判定 (基于新棋盘)
+        checkWin();
+        
+        // 游戏结束判定 (在生成新块后)
+        if (isGameActuallyOver()) {
+            gameOverFlag = true;
+            showMessage('💀 GAME OVER 💀  点击新游戏', true);
+        }
+        
+        return true;
+    }
+    
+    // 深拷贝棋盘
+    function copyBoard(source) {
+        return source.map(row => [...row]);
+    }
+    
+    // ---------- 渲染网格 ----------
+    function getTileClass(value) {
+        if (value === 0) return 'tile';
+        if (value === 2) return 'tile tile-2';
+        if (value === 4) return 'tile tile-4';
+        if (value === 8) return 'tile tile-8';
+        if (value === 16) return 'tile tile-16';
+        if (value === 32) return 'tile tile-32';
+        if (value === 64) return 'tile tile-64';
+        if (value === 128) return 'tile tile-128';
+        if (value === 256) return 'tile tile-256';
+        if (value === 512) return 'tile tile-512';
+        if (value === 1024) return 'tile tile-1024';
+        if (value === 2048) return 'tile tile-2048';
+        return 'tile tile-super';
+    }
+    
+    function renderBoard() {
+        // 保证gridContainer有4x4个格子
+        const tiles = gridContainer.children;
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                const idx = i * 4 + j;
+                const value = board[i][j];
+                const tileDiv = tiles[idx];
+                if (tileDiv) {
+                    tileDiv.className = getTileClass(value);
+                    tileDiv.innerText = value !== 0 ? value : '';
+                }
+            }
+        }
+    }
+    
+    // 构建网格DOM (一次性创建)
+    function buildGrid() {
+        gridContainer.innerHTML = '';
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.innerText = '';
+                gridContainer.appendChild(tile);
+            }
+        }
+    }
+    
+    // ---------- 键盘控制 ----------
+    function handleKey(e) {
+        const key = e.key;
+        // 阻止箭头键滚动页面
+        if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight') {
+            e.preventDefault();
+        }
+        if (gameOverFlag) {
+            if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight') {
+                showMessage('游戏已结束，点击新游戏', true);
+            }
+            return;
+        }
+        switch (key) {
+            case 'ArrowLeft': performMove(() => moveLeft()); break;
+            case 'ArrowRight': performMove(() => moveRight()); break;
+            case 'ArrowUp': performMove(() => moveUp()); break;
+            case 'ArrowDown': performMove(() => moveDown()); break;
+            default: return;
+        }
+    }
+    
+    // ---------- 触摸滑动支持 (移动端) ----------
+    let touchStart = null;
+    function onTouchStart(e) {
+        // 阻止页面滑动与缩放(针对游戏区域)
+        e.preventDefault();
+        const touch = e.touches[0];
+        touchStart = { x: touch.clientX, y: touch.clientY };
+    }
+    
+    function onTouchEnd(e) {
+        if (!touchStart) return;
+        e.preventDefault();
+        const touchEnd = e.changedTouches[0];
+        const deltaX = touchEnd.clientX - touchStart.x;
+        const deltaY = touchEnd.clientY - touchStart.y;
+        const absX = Math.abs(deltaX);
+        const absY = Math.abs(deltaY);
+        
+        if (Math.max(absX, absY) < 15) {
+            touchStart = null;
+            return;
+        }
+        
+        if (gameOverFlag) {
+            showMessage('游戏已结束，点击新游戏', true);
+            touchStart = null;
+            return;
+        }
+        
+        if (absX > absY) {
+            // 水平滑动
+            if (deltaX > 0) performMove(() => moveRight());
+            else performMove(() => moveLeft());
+        } else {
+            // 垂直滑动
+            if (deltaY > 0) performMove(() => moveDown());
+            else performMove(() => moveUp());
+        }
+        touchStart = null;
+    }
+    
+    function onTouchMove(e) {
+        // 阻止滑动时的页面滚动
+        e.preventDefault();
+    }
+    
+    // 添加事件监听
+    function initEvents() {
+        window.addEventListener('keydown', handleKey);
+        const wrapper = document.getElementById('gameGridWrapper');
+        wrapper.addEventListener('touchstart', onTouchStart, { passive: false });
+        wrapper.addEventListener('touchend', onTouchEnd, { passive: false });
+        wrapper.addEventListener('touchmove', onTouchMove, { passive: false });
+        newGameBtn.addEventListener('click', () => {
+            initGame();
+            // 强制重置标志位
+            gameOverFlag = false;
+            winFlag = false;
+            winAchieved = false;
+            messageArea.innerHTML = '';
+            renderBoard();
+            updateScoreUI();
+            // 额外检查: 初始不会有gameover
         });
-    </script>
+    }
+    
+    // ----- 程序启动 -----
+    function startGame() {
+        loadBestScore();
+        buildGrid();
+        initGame();   // 重置棋盘并生成两个数字
+        initEvents();
+        renderBoard();
+    }
+    
+    startGame();
+</script>
 </body>
 </html>
